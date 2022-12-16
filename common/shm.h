@@ -48,8 +48,8 @@ extern "C"
 {
 #endif
 
-#define MAX_SERVERS 8               /* maximum concurrent servers */
-#define MAX_SHM_ID 256              /* generally about 16 per server */
+#define MAX_SERVERS 64               /* maximum concurrent servers */
+#define MAX_SHM_ID 1024              /* generally about 16 per server */
 #define JACK_SHM_MAGIC 0x4a41434b	/* shm magic number: "JACK" */
 #define JACK_SHM_NULL_INDEX -1		/* NULL SHM index */
 #define JACK_SHM_REGISTRY_INDEX -2	/* pseudo SHM index for registry */
