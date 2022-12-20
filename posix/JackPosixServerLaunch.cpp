@@ -94,42 +94,43 @@ static void start_server_classic_aux(const char* server_name)
     size_t result = 0;
     char** argv = 0;
     int i = 0;
-    int good = 0;
     int res;
 
+    snprintf(arguments, 255, "%s", getenv("JACK_ARGUMENTS"));
     snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
     fp = fopen(filename, "r");
 
-    if (!fp) {
-        fp = fopen("/etc/jackdrc", "r");
-    }
-    /* if still not found, check old config name for backwards compatability */
-    if (!fp) {
-        fp = fopen("/etc/jackd.conf", "r");
-    }
+    if(!strlen(arguments)) {
+        if (!fp) {
+            fp = fopen("/etc/jackdrc", "r");
+        }
+        /* if still not found, check old config name for backwards compatability */
+        if (!fp) {
+            fp = fopen("/etc/jackd.conf", "r");
+        }
 
-    if (fp) {
-        arguments[0] = '\0';
-        res = fscanf(fp, "%s", buffer);
-        while (res != 0 && res != EOF) {
-            strcat(arguments, buffer);
-            strcat(arguments, " ");
+        if (fp) {
+            arguments[0] = '\0';
             res = fscanf(fp, "%s", buffer);
+            while (res != 0 && res != EOF) {
+                strcat(arguments, buffer);
+                strcat(arguments, " ");
+                res = fscanf(fp, "%s", buffer);
+            }
+            fclose(fp);
         }
-        if (strlen(arguments) > 0) {
-            good = 1;
-        }
-        fclose(fp);
+    } else {
+        fprintf(stderr, "JACK_ARGUMENTS is running %s \n", arguments);
     }
 
-    if (!good) {
-        command = (char*)(JACK_LOCATION "/jackd");
-        strncpy(arguments, JACK_LOCATION "/jackd -T -d " JACK_DEFAULT_DRIVER, 255);
-    } else {
+    if (strlen(arguments) > 0) {
         result = strcspn(arguments, " ");
         command = (char*)malloc(result + 1);
         strncpy(command, arguments, result);
         command[result] = '\0';
+    } else {
+        command = (char*)(JACK_LOCATION "/jackd");
+        strncpy(arguments, JACK_LOCATION "/jackd -T -d " JACK_DEFAULT_DRIVER, 255);
     }
 
     argv = (char**)malloc(255);
